@@ -13,14 +13,12 @@ public class App
 {
     public static void main( String[] args ) throws SchedulerException {
 
-
-        JobDetail job = newJob(ExampleJob.class)
+        JobDetail job = newJob(AnExampleJob.class)
                             .withIdentity("example job", "example group")
                             .build();
 
         Trigger trigger = newTrigger()
                                 .withIdentity("exampleTrigger", "exampleTriggerGroup")
-                                .startNow()
                                 .withSchedule(
                                         simpleSchedule()
                                                 .withIntervalInMilliseconds(1000)
@@ -35,14 +33,6 @@ public class App
         sch.start();
 
         sch.scheduleJob(job, trigger);
-    }
-
-    public class ExampleJob implements Job {
-
-        @Override
-        public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-            System.out.println(String.format("Executing current job: {0)", jobExecutionContext));
-        }
     }
 
 }
