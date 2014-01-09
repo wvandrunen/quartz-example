@@ -1,5 +1,8 @@
 package com.quartz.example;
 
+import com.quartz.example.jobs.RetryJob;
+import com.quartz.example.jobs.SimpleJob;
+import com.quartz.example.jobs.StopOnExceptionJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -10,36 +13,56 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class App
 {
     public static void main( String[] args ) throws SchedulerException {
+        // Jobs
+        JobDetail simpleJob = createSimpleJob();
+        JobDetail stopOnExceptionJob = createStopOnExceptionJob();
+        JobDetail retryJob = createRetryJob();
 
-        JobDetail simpleJob = newJob(SimpleJob.class)
-                            .withIdentity("example simpleJob", "example group")
-                            .build();
+        // Trigger
+        Trigger trigger = createTrigger();
 
-        JobDetail stopOnExceptionJob = newJob(StopOnExceptionJob.class)
-                            .build();
-
-        JobDetail refireOnExceptionJob = newJob(RefireOnExceptionJob.class)
-                            .build();
-
-        Trigger trigger = newTrigger()
-                                .withIdentity("exampleTrigger", "exampleTriggerGroup")
-                                .withSchedule(
-                                        simpleSchedule()
-                                                .withIntervalInMilliseconds(1000)
-                                                .repeatForever()
-                                )
-                                .build();
-
+        // Creating the scheduler
         SchedulerFactory schFactory = new StdSchedulerFactory();
 
-        Scheduler sch = schFactory.getScheduler();
+        Scheduler scheduler = schFactory.getScheduler();
 
-        sch.start();
+        // Starting the jobs
+        scheduler.start();
 
-        //sch.scheduleJob(simpleJob, trigger);
-        //sch.scheduleJob(stopOnExceptionJob, trigger);
+        //scheduler.scheduleJob(simpleJob, trigger);
+        //scheduler.scheduleJob(stopOnExceptionJob, trigger);
+        scheduler.scheduleJob(retryJob, trigger);
+    }
 
-        sch.scheduleJob(refireOnExceptionJob, trigger);
+    private static SimpleTrigger createTrigger() {
+        return newTrigger()
+            .withIdentity("exampleTrigger", "exampleTriggerGroup")
+            .withSchedule(
+                    simpleSchedule()
+                            .withIntervalInMilliseconds(5000)
+                            .repeatForever()
+            )
+            .build();
+    }
+
+    private static JobDetail createRetryJob() {
+        JobDetail jobDetail = newJob(RetryJob.class)
+                .build();
+
+        jobDetail.getJobDataMap().put(RetryJob.RETRIES_FIELD, 3);
+
+        return jobDetail;
+    }
+
+    private static JobDetail createStopOnExceptionJob() {
+        return newJob(StopOnExceptionJob.class)
+                .build();
+    }
+
+    private static JobDetail createSimpleJob() {
+        return newJob(SimpleJob.class)
+                .withIdentity("example simpleJob", "example group")
+                .build();
     }
 
 }
