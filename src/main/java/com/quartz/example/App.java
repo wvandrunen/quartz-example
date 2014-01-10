@@ -39,7 +39,7 @@ public class App
             .withIdentity("exampleTrigger", "exampleTriggerGroup")
             .withSchedule(
                     simpleSchedule()
-                            .withIntervalInMilliseconds(5000)
+                            .withIntervalInSeconds(1)
                             .repeatForever()
             )
             .build();
@@ -49,7 +49,7 @@ public class App
         JobDetail jobDetail = newJob(RetryJob.class)
                 .build();
 
-        jobDetail.getJobDataMap().put(RetryJob.RETRIES_FIELD, 3);
+        jobDetail.getJobDataMap().put(RetryJob.RETRIES_FIELD, RetryJob.RETRIES_AMOUNT);
 
         return jobDetail;
     }
