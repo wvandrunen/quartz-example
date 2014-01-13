@@ -39,7 +39,7 @@ public class App
             .withIdentity("exampleTrigger", "exampleTriggerGroup")
             .withSchedule(
                     simpleSchedule()
-                            .withIntervalInSeconds(1)
+                            .withIntervalInSeconds(10)
                             .repeatForever()
             )
             .build();

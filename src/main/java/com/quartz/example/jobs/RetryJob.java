@@ -21,7 +21,6 @@ public class RetryJob implements Job {
 
             int retries = retrieveAndUpdateAmountOfRetriesLeft(jobExecutionContext);
 
-            System.out.println(String.format("Retries left: %s", retries));
 
             if(retries >= 0) {
 
@@ -31,6 +30,8 @@ public class RetryJob implements Job {
                 } catch (InterruptedException e) {}
 
                 jobExecutionException.setRefireImmediately(true);
+
+                System.out.println(String.format("Retries left: %s", retries));
 
                 throw jobExecutionException;
 
